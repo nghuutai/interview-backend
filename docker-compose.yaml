@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  node-app:
+    container_name: node-app
+    build:
+      context: ./node_app
+    restart: on-failure
+    ports:
+      - '5000:5000'
+    depends_on:
+      - postgres
+    networks:
+      - my-network-1
+    volumes:
+      - ./node_app:/app
+      - /app/node_modules
+    command: 'sh -c "npm start"'
+
+  postgres:
+    image: 'postgres:10'
+    container_name: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - my-network-1
+    volumes:
+    - ./init-data.sql:/docker-entrypoint-initdb.d/zzz.sql
+
+networks:
+  my-network-1:
+    driver: bridge
